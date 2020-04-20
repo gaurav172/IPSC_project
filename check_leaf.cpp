@@ -9,10 +9,14 @@ using namespace std;
 const int level_threshold = 800;
 const int n_leaf = 10;
 
-vector < vector < pair < int,double > > > X;
-vector < vector < int > > Y;
+vector< unordered_map<int,double> > X; 
+vector< unordered_map<int,bool> > Y;
 
-// assumed each of the data point vectors and label vectors sorted
+int N; // total no. of instances
+int d_x; // no. of dimensions in data vector
+int d_y; // no. of possible labels
+
+int NXT_NODE_ID;
 
 bool test_leaf(vector<int> instances,int level)
 {
@@ -36,16 +40,21 @@ bool test_leaf(vector<int> instances,int level)
 		if(d != (int) X[prv].size())
 			break;
 		
-		for(j=0;j<d;++j)
+		bool flag = 1;
+		for(auto v:X[cur])
 		{
-			if(X[cur][j].first != X[prv][j].first || abs(X[cur][j].second - X[prv][j].second) > 1e-5)
+			int dim = v.first;
+			double val = v.second;
+			if(abs(X[prv][dim]-val) > 1e-5)
+			{
+				flag = 0;
 				break;
+			}
 		}
-		if(j < d)
+		if(!flag)
 			break;
 	}
-	if(i == n)
-		return 1;
+	if(i == n) return 1;
 
 	// all the instances have the same labels
 	for(i=1;i<n;++i)
@@ -56,21 +65,26 @@ bool test_leaf(vector<int> instances,int level)
 		if(d != (int) Y[prv].size())
 			break;
 		
-		for(j=0;j<d;++j)
+		bool flag = 1;
+		for(auto v:Y[cur])
 		{
-			if(Y[cur][j] != Y[prv][j])
+			int dim = v.first;
+			bool val = v.second;
+			if(X[prv][dim] != val)
+			{
+				flag = 0;
 				break;
+			}
 		}
-		if(j < d)
+		if(!flag)
 			break;
 	}
-	if(i == n)
-		return 1;
+	if(i == n) return 1;
+
+	return 0;
 }
 
 int main()
 {
 	
 }
-
-	
