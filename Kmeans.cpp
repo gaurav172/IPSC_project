@@ -4,9 +4,10 @@ using namespace std;
 #define pb push_back
 #define ff first
 #define ss second
+#define sz(a) (int)a.size()
 #define umap unordered_map 
-
-vector<int> spherical_kmeans(vector<umap<int,double>> Yp,vector<int> inds,int k,int m)
+mt19937 rng(chrono::steady_clock::now().time_since_epoch().count());
+vector<int> spherical_kmeans(vector<umap<int,double>> Yp,vector<int> inds,int k)
 {
 	// inds = Indices which have been chosen to build classifier at current node
 	// k = number of clusters
@@ -117,7 +118,7 @@ vector<int> spherical_kmeans(vector<umap<int,double>> Yp,vector<int> inds,int k,
 			{
 				double df;
 				auto it = new_centroids[i].find(u.ff);
-				if(it==new_centroids.end())
+				if(it==new_centroids[i].end())
 					df = u.ss;
 				else
 					df = abs(u.ss - it->ss);
@@ -142,7 +143,7 @@ vector<int> spherical_kmeans(vector<umap<int,double>> Yp,vector<int> inds,int k,
 	return labels;	
 }
 
-vector<umap<int,double> buildClassifier(vecotr<umap<int,double>> Xp,vector<int> labels,vector<int> inds,int k,int m)
+vector<umap<int,double>> buildClassifier(vector<umap<int,double>> Xp,vector<int> labels,vector<int> inds,int k,int m)
 {
 	// Find centroids of X
 	vector<umap<int,double>> centroids;
@@ -151,7 +152,7 @@ vector<umap<int,double> buildClassifier(vecotr<umap<int,double>> Xp,vector<int> 
 		umap<int,double> vec;
 		centroids.pb(vec);
 	}
-
+	int n = inds.size();
 	for(int i=0;i<n;i++)
 	{
 		int id = inds[i];
@@ -181,6 +182,17 @@ vector<umap<int,double> buildClassifier(vecotr<umap<int,double>> Xp,vector<int> 
 			it->ss /= mag;
 	}
 	return centroids;
+}
+
+vector<umap<int,double> > trainNodeClassifier(vector<int> inds,int k)
+{
+	shuffle(all(inds),rng);	
+	int smp = min(sz(inds),100);
+	vector<int> samples;
+	for(int i=0;i<smp;i++)
+		samples.pb(inds[i]);
+	// Call spherical K-means to get Labels
+	// After getting Lables call buildClassifier to get Classifier.
 }
 
 int main()
