@@ -133,46 +133,27 @@ void getInpY()
 void intialize_seeds()
 {
 	ll mod = (1LL<<32)-1;
+	srand(time(NULL));
 	seedIndexX = (rand()*rand()*rand())%mod;
 	seedIndexY = (rand()*rand()*rand())%mod;
 	seedSignX = (rand()*rand()*rand())%mod;
 	seedSignY = (rand()*rand()*rand())%mod;
 }
-int getHash(int i,ll mod,ll seed)
+ll getHash(int i,ll mod,ll seed)
 {
-	const string key = "azv" + to_string(i);
+	const int key = i;
 	uint32_t p[4];
-	MurmurHash3_x64_128(&key, (uint64_t)sz(key), seed, &p);			
-	ll c=(1LL<<32);
-	ll res=0;
-	for(int j=0;j<4;j++)
-	{
-		ll x=p[j];
-		res=(res*c)%mod;
-		res=(res+x)%mod;
-	}
-	return res;
+	MurmurHash3_x86_32(&key, sizeof(int), seed, &p);			
+	ll res = (ll)p[0];
+	return res%mod;
 }
 void ProjectX()
 {
-	freopen("projx.txt","r",stdin);
-	for(int i=0;i<xdim;i++)
+	for(int i = 0;i < xdim;i++)
 	{
-		int x;
-		cin>>x;
-		ProjColX.pb(x);
-	}	
-	for(int i=0;i<xdim;i++)
-	{
-		int s;
-		cin>>s;
-		ProjSignX.pb(s);
+		ProjColX.pb(getHash(i,projDimx,seedIndexX));
+		ProjSignX.pb(2*getHash(i,2,seedSignX)-1);
 	}
-	// for(int i = 0;i < xdim;i++)
-	// {
-	// 	ProjColX.pb(getHash(i,projDimx,seedIndexX));
-	// 	ProjSignX.pb(getHash(i,2,seedSignX));
-	// }
 	for(int i=0;i<n;i++)
 	{
 		for(auto u:X[i])
@@ -183,24 +164,11 @@ void ProjectX()
 }
 void ProjectY()
 {
-	freopen("projy.txt","r",stdin);
-	for(int i=0;i<ydim;i++)
+	for(int i = 0;i < ydim;i++)
 	{
-		int x;
-		cin>>x;
-		ProjColY.pb(x);
+		ProjColY.pb(getHash(i,projDimy,seedIndexY));
+		ProjSignY.pb(2*getHash(i,2,seedSignY)-1);
 	}
-	for(int i=0; i<ydim;i++)
-	{
-		int s;
-		cin>>s;
-		ProjSignY.pb(s);
-	}
-	// for(int i = 0;i < ydim;i++)
-	// {
-	// 	ProjColY.pb(getHash(i,projDimy,seedIndexY));
-	// 	ProjSignY.pb(getHash(i,2,seedSignY));
-	// }
 	for(int i=0;i<n;i++)
 	{
 		for(auto u:Y[i])
@@ -211,8 +179,8 @@ void ProjectY()
 }
 int main()
 {
-	getInpX();
-	getInpY();
+	// getInpX();
+	// getInpY();
 	intialize_seeds();
 	ProjectX();
 	ProjectY();
